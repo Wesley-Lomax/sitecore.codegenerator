@@ -1,5 +1,5 @@
 ﻿<#@ assembly name="System.Core" #>
-<#@ assembly name="$(SolutionDir)Lib\Sitecore.Kernel.DLL" #>
+<#@ assembly name="$(SolutionDir)packages\Sitecore.Kernel.NoReferences.8.2.170728\lib\NET452\Sitecore.Kernel.dll" #>
 <#@ import namespace="Sitecore.CodeGenerator.Domain" #>
 <#@ import namespace="System.Linq" #>
 <#+

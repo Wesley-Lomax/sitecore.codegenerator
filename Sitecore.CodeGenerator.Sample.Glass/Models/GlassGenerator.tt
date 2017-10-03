@@ -1,5 +1,5 @@
 ﻿<#@ assembly name="$(SolutionDir)Sitecore.CodeGenerator\bin\Debug\Sitecore.CodeGenerator.dll" #>
-<#@ assembly name="$(SolutionDir)Lib\Sitecore.Kernel.DLL" #>
+<#@ assembly name="$(SolutionDir)packages\Sitecore.Kernel.NoReferences.8.2.170728\lib\NET452\Sitecore.Kernel.dll" #>
 <#@ assembly name="$(ProjectDir)bin\Debug\Glass.Mapper.Sc.DLL" #>
 <#@ import namespace="Sitecore.CodeGenerator" #>
 <#@ import namespace="System.Collections.Generic" #>
