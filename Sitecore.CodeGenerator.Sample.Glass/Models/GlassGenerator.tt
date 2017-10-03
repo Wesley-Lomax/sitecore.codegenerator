@@ -1,6 +1,8 @@
 ﻿<#@ assembly name="$(SolutionDir)Sitecore.CodeGenerator\bin\Debug\Sitecore.CodeGenerator.dll" #>
 <#@ assembly name="$(SolutionDir)packages\Sitecore.Kernel.NoReferences.8.2.170728\lib\NET452\Sitecore.Kernel.dll" #>
-<#@ assembly name="$(ProjectDir)bin\Debug\Glass.Mapper.Sc.DLL" #>
+<#@ assembly name="$(SolutionDir)packages\Glass.Mapper.Sc.Core.4.4.0.199\lib\100\Glass.Mapper.Sc.dll" #>
+<#@ assembly name="$(SolutionDir)packages\Rainbow.Storage.Yaml.2.0.0\lib\net452\Rainbow.Storage.Yaml.dll" #>
+<#@ assembly name="$(SolutionDir)packages\Rainbow.Core.2.0.0\lib\net452\Rainbow.dll" #>
 <#@ import namespace="Sitecore.CodeGenerator" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="Glass.Mapper.Sc.Fields" #>
@@ -37,18 +39,19 @@ public class GlassGenerator : Generator
 
 	protected override void RunCore()
 	{
+	    //System.Diagnostics.Debugger.Launch();	
 		// If you are using Rainbow serialization, you need to make some changes to the following lines
 		// This is described on https://github.com/hermanussen/sitecore.codegenerator#using-unicorns-rainbow-format
 		this.GlassTemplate = new GlassMappedClassTemplate();
-		var resolver = new TemplatesResolver(
-			Context.Host.ResolvePath(@"..\Data\serialization\"),
+		var resolver = new TemplatesResolverRainbow(
+			Context.Host.ResolvePath(@"..\Data\Unicorn\"),
 			Paths,
 			Database);
 		foreach(var template in resolver.Templates)
 		{
 			this.GlassTemplate.Template = template;
 			this.GlassTemplate.GetFieldOptionsFunction = GetFieldOptions;
-			string fileName = string.Concat("I", this.GlassTemplate.Identifier(template.SyncItem.Name), ".gen.cs");
+			string fileName = string.Concat("I", this.GlassTemplate.Identifier(template.SyncItem.Name), ".cs");
 			this.GlassTemplate.RenderToFile(fileName);
 			this.GeneratedFiles.Add(fileName);
 		}
@@ -57,47 +60,83 @@ public class GlassGenerator : Generator
 	public FieldOptions GetFieldOptions(string fieldType, string fieldId)
 	{
 		FieldOptions result = new FieldOptions();
-		switch (fieldType)
+		switch (fieldType.ToLower())
 		{
-			case "Checkbox":
+			case "checkbox":
 				result.GlassFieldTypeName = "bool";
 				break;
-			case "Integer":
+			case "integer":
 				result.GlassFieldTypeName = "int";
 				break;
-			case "Number":
+			case "number":
 				result.GlassFieldTypeName = typeof(Decimal).Name;
 				break;
-			case "Date":
-			case "Datetime":
+			case "password":
+			case "icon":
+			case "rich text":
+			case "html":
+			case "single-line text":
+			case "multi-line text":
+			case "frame":
+			case "text":
+			case "memo":
+			case "droplist":
+			case "grouped droplist":
+			case "valuelookup":
+				result.GlassFieldTypeName = "string";
+				break;
+			case "date":
+			case "datetime":
 				result.GlassFieldTypeName = typeof(DateTime).Name;
 				break;
-			case "File":
-			case "File Drop Area":
-				result.GlassFieldTypeName = typeof(File).Name;
+			case "file":
+			case "file drop area":
+				result.GlassFieldTypeName = typeof(Glass.Mapper.Sc.Fields.File).Name;
 				break;
-			case "Name Value List":
-			case "Name Lookup Value List":
+			case "image":
+				result.GlassFieldTypeName = typeof(Glass.Mapper.Sc.Fields.Image).Name;
+				break;
+			case "name value list":
+			case "name lookup value list":
 				result.GlassFieldTypeName = typeof(System.Collections.Specialized.NameValueCollection).Name;
 				break;
 			// case "???": result.GlassFieldTypeName = typeof(HtmlEncodedString).Name; break;
 			case "Image":
 				result.GlassFieldTypeName = typeof(Image).Name;
 				break;
-			case "Droplink":
-			case "Droptree":
-			case "General Link":
-			case "General Link with Search":
-			case "Version Link":
+			case "general link":
+			case "general link with search":
+			case "version link":
 			case "link":
 				result.GlassFieldTypeName = typeof(Link).Name;
 				break;
 			// case "???": result.GlassFieldTypeName = typeof(LinkType).Name; break;
-			case "Tristate":
+			case "tristate":
 				result.GlassFieldTypeName = typeof(TriState).Name;
 				break;
+			case "treelist with search":
+			case "treelist":
+			case "treelistex":
+			case "treelist descriptive":
+			case "checklist":
+			case "multilist with search":
+			case "multilist":			
+				result.GlassFieldTypeName = "IEnumerable<Guid>";
+				break;
+			case "grouped droplink":
+			case "droplink":
+			case "lookup":
+			case "droptree":
+			case "reference":
+			case "tree":
+				result.GlassFieldTypeName =  "Guid";
+				break;
+			case "linklist":
+				result.GlassFieldTypeName = "LinkList";
+				break;
+				
 			default:
-				result.GlassFieldTypeName = "string";
+				result.GlassFieldTypeName =  "object /* UNKNOWN field type: [" + fieldType + "] */";
 				break;
 		}
 		SetCustomOptionsFunction(fieldId, result);

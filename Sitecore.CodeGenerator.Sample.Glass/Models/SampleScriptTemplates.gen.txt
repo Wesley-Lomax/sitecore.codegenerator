@@ -1,7 +1,12 @@
 ﻿
 
+
+
+
+
+
 These files were generated:
-- IAnimal.gen.cs
-- IDog.gen.cs
-- IFood.gen.cs
-- INameable.gen.cs
+- IAnimal.cs
+- IDog.cs
+- IFood.cs
+- INameable.cs

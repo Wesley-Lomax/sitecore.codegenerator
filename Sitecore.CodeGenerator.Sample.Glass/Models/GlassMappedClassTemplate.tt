@@ -2,6 +2,18 @@
 <#@ assembly name="$(SolutionDir)packages\Sitecore.Kernel.NoReferences.8.2.170728\lib\NET452\Sitecore.Kernel.dll" #>
 <#@ import namespace="Sitecore.CodeGenerator.Domain" #>
 <#@ import namespace="System.Linq" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ assembly name="System.Core.dll" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ include file="Helpers.tt" #>
+<#@ include file="StringExtensions.tt" #>
+<#@ include file="Inflector.tt" #>
+
+
+<#@ parameter name="DefaultNamespace" type="System.String" #>
+
 <#+
 public class GlassMappedClassTemplate : CSharpTemplate
 {
@@ -12,34 +24,26 @@ public class GlassMappedClassTemplate : CSharpTemplate
 	private string Extends { get; set; }
 
 	public override string TransformText()
-	{
-		this.Extends = string.Empty;
-		if(this.Template.BaseTemplates.Any())
-		{
-			this.Extends = string.Concat(" : ", string.Join(", ", this.Template.BaseTemplates.Select(b => string.Concat("I", Identifier(b.SyncItem.Name)))));
-		}
-		else
-		{
-			this.Extends = string.Empty; //" : IModelBase";
-		}
-
+	{		
 		base.TransformText();
 #>
-namespace <#= DefaultNamespace #>
+
+namespace <#= GetFullNamespace(DefaultNamespace, Template)#>
 {
-	using System;
-    using System.Collections.Generic;
-	using System.Collections.Specialized;
-    using global::Glass.Mapper.Sc.Configuration;
-    using global::Glass.Mapper.Sc.Configuration.Attributes;
-	using global::Glass.Mapper.Sc.Fields;
+using global::Sitecore.Data;
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Collections.Specialized;
+using global::Glass.Mapper.Sc.Configuration.Attributes;
+using global::Glass.Mapper.Sc.Configuration;
+using global::Glass.Mapper.Sc.Fields;
 
 	/// <summary>
 	/// Represents a mapped type for item <#= Template.SyncItem.ID #> in Sitecore.
 	/// Path: <#= Template.SyncItem.ItemPath #>
 	/// </summary>
-	[SitecoreType(TemplateId = "<#= Template.SyncItem.ID #>")]
-	public partial interface I<#=Identifier(Template.SyncItem.Name)#><#=Extends#>
+	[SitecoreType(TemplateId = <#= AsInterfaceName(Template.SyncItem.Name) #>Constants.TemplateIdString, Cachable = true)]
+	public partial interface I<#=Identifier(Template.SyncItem.Name)#>: IGlassBase <#=GetObjectInheritanceDefinition(DefaultNamespace, Template, true, (string s) => AsInterfaceName(s))#>
 	{
 <#+
 		foreach(var section in Template.Sections)
@@ -60,7 +64,7 @@ namespace <#= DefaultNamespace #>
 <#+
 				}
 #>
-	    [SitecoreField(FieldId = "<#=field.SyncItem.ID#>"<#=fieldOptions.AttributeExtras ?? string.Empty #>)]
+	    [SitecoreField(<#= AsInterfaceName(Template.SyncItem.Name) #>Constants.<#=Identifier(field.SyncItem.Name)#>FieldName<#=fieldOptions.AttributeExtras ?? string.Empty #>)]
 		<#=fieldOptions.GlassFieldTypeName#> <#=Identifier(field.SyncItem.Name)#> { get; set; }
 
 <#+
@@ -72,9 +76,57 @@ namespace <#= DefaultNamespace #>
 		}
 #>
 	}
+
+	public static partial class <#= AsInterfaceName(Template.SyncItem.Name) #>Constants
+	{
+		public const string TemplateIdString = "<#= Template.SyncItem.ID #>";
+		public static readonly ID TemplateId = new ID("<#=Template.SyncItem.ID #>");
+		public const string TemplateName = "<#= Template.SyncItem.Name #>";
+
+<#+
+			foreach(var section in Template.Sections)
+			{
+#>
+
+<#+		
+	foreach(var field in section.Fields)
+	{		
+#>			
+		public static readonly ID <#=Identifier(field.SyncItem.Name)#>FieldId = new ID("<#=field.SyncItem.ID#>");
+		public const string <#=Identifier(field.SyncItem.Name)#>FieldName = "<#=field.SyncItem.Name#>";
+<#+
+	}
+#>
+<#+
+}
+#>
+	}
 }
 <#+
         return this.GenerationEnvironment.ToString();
 	}
 }
+#>
+
+<#+
+/// <summary>
+/// Gets the inheritance string for the generated template
+/// </summary>
+/// <param name="defaultNamespace">The default namespace.</param>
+/// <param name="template">The template to get the bases for.</param>
+/// <param name="nameFunc">The function to run the base templates names through.</param>
+/// <returns></returns>
+public static string GetObjectInheritanceDefinition(string defaultNamespace, TemplateItem item, bool includeLeadingComma, Func<string, string> nameFunc)
+{
+	if (item.BaseTemplates.Count > 0)
+	{
+		return string.Concat(includeLeadingComma ? ", " : "",
+								item.BaseTemplates
+								.Select( bt => string.Concat("global::",GetFullyQualifiedName(defaultNamespace, bt, nameFunc))) // select the name of the template with an 'I' prefix
+								.Aggregate( (total,next) => total + ", " + next) // basically a string.join(string[], '')
+							);
+	}
+	return "";
+}
+
 #>

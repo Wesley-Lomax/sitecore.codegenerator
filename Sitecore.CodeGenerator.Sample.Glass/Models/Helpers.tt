@@ -1,0 +1,67 @@
+﻿<#+	
+
+/// <summary>
+/// Gets the fuly qualified name of the object.
+/// </summary>
+/// <param name="defaultNamespace">The default namespace.</param>
+/// <param name="template">The template.</param>
+public static string GetFullyQualifiedName(string defaultNamespace, TemplateItem item)
+{
+	return GetFullyQualifiedName(defaultNamespace, item, AsClassName);
+}
+
+/// <summary>
+/// Gets the fuly qualified name of the object.
+/// </summary>
+/// <param name="defaultNamespace">The default namespace.</param>
+/// <param name="template">The template.</param>
+/// <param name="nameFunc">The function to run the template name through.</param>
+public static string GetFullyQualifiedName(string defaultNamespace, TemplateItem item, Func<string, string> nameFunc)
+{
+	return string.Concat(GetFullNamespace(defaultNamespace, item), ".", nameFunc(item.SyncItem.Name));
+}
+
+
+public static string GetFullNamespace(string defaultNamespace, TemplateItem template)  
+{
+    var path = template.SyncItem.ItemPath;
+
+    path = Regex.Replace(path, "^", "", RegexOptions.IgnoreCase);
+
+    var parts = path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+    parts = parts.Select(AsValidWord).ToArray();
+    var templateNamespace = string.Join(".", parts.Take(parts.Length - 1));
+
+    return JoinNamespaces(defaultNamespace, templateNamespace);
+}
+
+public static string JoinNamespaces(params string[] namespaces)  
+{
+    return string.Join(".", namespaces.Where(x => !string.IsNullOrEmpty(x)));
+}
+
+
+/// <summary>
+/// Gets a custom propery from the data assuming it is querystring format
+/// </summary>
+/// <param name="data">A string in query string format.</param>
+/// <param name="key">The key to get the value for.</param>
+/// <returns>The value, or an empty string</returns>
+public static string GetCustomProperty(string data, string key)
+{
+	if (string.IsNullOrEmpty(data))
+		return "";
+	
+	string[] strArray = data.Split(new char[] { '&' });
+    string keyEquals = key + "=";
+    int length = keyEquals.Length;
+    foreach (string keyValuePair in strArray)
+    {
+        if ((keyValuePair.Length > length) && keyValuePair.StartsWith(keyEquals, StringComparison.OrdinalIgnoreCase))
+        {
+            return keyValuePair.Substring(length);
+        }
+    }
+    return "";
+}
+#>

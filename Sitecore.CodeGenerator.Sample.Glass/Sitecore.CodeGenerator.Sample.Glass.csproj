@@ -31,17 +31,27 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core">
-      <HintPath>..\packages\Castle.Core.1.1.0\lib\Castle.Core.dll</HintPath>
+    <Reference Include="Castle.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Glass.Mapper">
-      <HintPath>..\packages\BoC.Glass.Mapper.1.0.3\lib\net45\Glass.Mapper.dll</HintPath>
+    <Reference Include="Glass.Mapper, Version=4.4.0.199, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Glass.Mapper.Sc.Core.4.4.0.199\lib\net45\Glass.Mapper.dll</HintPath>
     </Reference>
-    <Reference Include="Glass.Mapper.Sc">
-      <HintPath>..\packages\BoC.Glass.Mapper.Sc.1.0.3\lib\net45\Glass.Mapper.Sc.dll</HintPath>
+    <Reference Include="Glass.Mapper.Sc, Version=4.4.0.199, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Glass.Mapper.Sc.Core.4.4.0.199\lib\100\Glass.Mapper.Sc.dll</HintPath>
     </Reference>
-    <Reference Include="log4net">
+    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Rainbow, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rainbow.Core.2.0.0\lib\net452\Rainbow.dll</HintPath>
+    </Reference>
+    <Reference Include="Rainbow.Storage.Yaml, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rainbow.Storage.Yaml.2.0.0\lib\net452\Rainbow.Storage.Yaml.dll</HintPath>
+    </Reference>
+    <Reference Include="Sitecore.Kernel, Version=10.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sitecore.Kernel.NoReferences.8.2.170728\lib\NET452\Sitecore.Kernel.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -52,16 +62,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\IAnimal.gen.cs">
+    <Compile Include="Models\IAnimal.cs">
       <DependentUpon>SampleScriptTemplates.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\IDog.gen.cs">
+    <Compile Include="Models\IDog.cs">
       <DependentUpon>SampleScriptTemplates.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\IFood.gen.cs">
+    <Compile Include="Models\IFood.cs">
       <DependentUpon>SampleScriptTemplates.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\INameable.gen.cs">
+    <Compile Include="Models\IGlassBase.cs" />
+    <Compile Include="Models\INameable.cs">
       <DependentUpon>SampleScriptTemplates.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -72,10 +83,10 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>SampleScriptTemplates.gen.txt</LastGenOutput>
       <LastOutputs>
-.\IAnimal.gen.cs
-.\IDog.gen.cs
-.\IFood.gen.cs
-.\INameable.gen.cs
+.\IAnimal.cs
+.\IDog.cs
+.\IFood.cs
+.\INameable.cs
 .\SampleScriptTemplates.gen.txt
 </LastOutputs>
     </None>
@@ -93,10 +104,22 @@
   <ItemGroup>
     <Content Include="Data\serialization\Readme.txt" />
     <Content Include="Data\Unicorn\Readme.txt" />
+    <Content Include="Models\Helpers.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Helpers.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\Inflector.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Inflector.cs</LastGenOutput>
+    </Content>
     <Content Include="Models\SampleScriptTemplates.gen.txt">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>SampleScriptTemplates.tt</DependentUpon>
+    </Content>
+    <Content Include="Models\StringExtensions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>StringExtensions.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
