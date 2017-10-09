@@ -36,7 +36,7 @@ namespace Sitecore.CodeGenerator.Tests
         [Test]
         public void ShouldResolveTemplatesFromProject()
         {
-            DirectoryInfo serializationFolder = new DirectoryInfo(@"..\..\..\Sitecore.CodeGenerator.Scripty.Sample.Glass\Data\Unicorn");
+            DirectoryInfo serializationFolder = new DirectoryInfo(@"..\..\..\Sitecore.CodeGenerator.Sample.Glass\Data\Unicorn");
             serializationFolder.Exists.Should().BeTrue();
             var files = serializationFolder.GetFiles("*.yml", SearchOption.AllDirectories);
             files.Length.ShouldBeEquivalentTo(14);

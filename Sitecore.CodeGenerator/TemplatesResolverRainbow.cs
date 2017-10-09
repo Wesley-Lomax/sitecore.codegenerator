@@ -48,6 +48,10 @@ namespace Sitecore.CodeGenerator
         {
             var formatter = new YamlSerializationFormatter(null, null);
 
+            //Checking path is a template, Helix structure means have to traverse more directories bringing in serialized roles and other yml files.
+            if (!itemFile.FullName.Contains(@"\serialization\Templates"))
+                return null;
+
             SyncItem syncItem = null;
             using (StreamReader sr = new StreamReader(itemFile.FullName))
             {
